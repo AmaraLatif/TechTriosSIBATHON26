@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GridPay Calculator</title>
+<style>
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: 
+            linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+            url('gettyimages-1283888226-640x640.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: white;
+    }
+
+
+    .container {
+        background: rgba(0,0,0,0.6);
+        padding: 40px 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.7);
+        width: 350px;
+        text-align: center;
+    }
+
+    h1 {
+        color: #00ffcc;
+        margin-bottom: 30px;
+        font-size: 24px;
+    }
+
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+    }
+
+    input.invalid {
+        border: 2px solid red;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        background: #00ffcc;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #00ccaa;
+    }
+
+
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        display: none;
+        text-align: left;
+    }
+
+    .green {
+        color: #00ff99;
+    }
+
+    .red {
+        color: #ff4d4d;
+    }
+
+    p {
+        margin: 5px 0;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚡ GridPay Calculator</h1>
+
+    <input type="number" id="units" placeholder="Enter Units Consumed">
+
+    <button onclick="calculateBill()">Calculate Bill</button>
+
+    <div class="result" id="resultBox">
+        <h2 id="totalBill"></h2>
+        <p id="breakdown"></p>
+        <p id="savingMessage"></p>
+        <p id="rewardMessage"></p>
+    </div>
+</div>
+
+<script>
+function calculateBill() {
+    const unitsInput = document.getElementById("units");
+    let units = parseFloat(unitsInput.value);
+
+    unitsInput.classList.remove("invalid");
+    document.getElementById("resultBox").style.display = "block";
+
+    if (isNaN(units) || units <= 0) {
+        document.getElementById("totalBill").innerHTML = "⚠ Invalid Input!";
+        document.getElementById("breakdown").innerHTML = "Please enter a positive number of units.";
+        document.getElementById("savingMessage").innerHTML = "";
+        document.getElementById("rewardMessage").innerHTML = "";
+        unitsInput.classList.add("invalid");
+        return;
+    }
+
+    let energyCost = 0;
+    let fixedCharge = 0;
+
+    if (units <= 100) {
+        energyCost = units * 22.44;
+        fixedCharge = 200;
+    } else if (units <= 200) {
+        energyCost = (100 * 22.44) + ((units - 100) * 28.91);
+        fixedCharge = 250;
+    } else if (units <= 300) {
+        energyCost = (100 * 22.44) + (100 * 28.91) + ((units - 200) * 33.10);
+        fixedCharge = 300;
+    } else if (units <= 400) {
+        energyCost = (100 * 22.44) + (100 * 28.91) + (100 * 33.10) + ((units - 300) * 37.99);
+        fixedCharge = 400;
+    } else if (units <= 700) {
+        energyCost = (100 * 22.44) + (100 * 28.91) + (100 * 33.10) + (100 * 37.99) + ((units - 400) * 42.76);
+        fixedCharge = 500;
+    } else {
+        energyCost = (100 * 22.44) + (100 * 28.91) + (100 * 33.10) + (100 * 37.99) + (300 * 42.76) + ((units - 700) * 45.00);
+        fixedCharge = 675;
+    }
+
+    let tax = energyCost * 0.10;
+    let totalBill = energyCost + tax + fixedCharge;
+
+    document.getElementById("totalBill").innerHTML = "Total Bill: Rs " + totalBill.toFixed(2);
+    document.getElementById("breakdown").innerHTML =
+        "Energy Cost: Rs " + energyCost.toFixed(2) +
+        "<br>Tax (10%): Rs " + tax.toFixed(2) +
+        "<br>Fixed Charges: Rs " + fixedCharge;
+
+    let savingMessage = "";
+    if (units <= 150) {
+        savingMessage = "<span class='green'>Great! Your usage is energy efficient 👍</span>";
+    } else if (units <= 300) {
+        savingMessage = "Moderate usage. Try reducing AC time or switching to LED bulbs.";
+    } else {
+        savingMessage = "<span class='red'>High consumption! Consider solar panels or energy-saving appliances.</span>";
+    }
+    document.getElementById("savingMessage").innerHTML = savingMessage;
+
+    let rewardMessage = "";
+    if (units < 120) {
+        rewardMessage = "🌱 You qualify for Green Energy Badge!";
+    }
+    document.getElementById("rewardMessage").innerHTML = rewardMessage;
+
+    localStorage.setItem("lastBill", totalBill.toFixed(2));
+}
+
+window.onload = function() {
+    let lastBill = localStorage.getItem("lastBill");
+    if (lastBill) {
+        alert("Your last calculated bill was Rs " + lastBill);
+    }
+}
+</script>
+
+</body>
+</ html>
